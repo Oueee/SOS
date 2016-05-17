@@ -8,7 +8,8 @@ class Ilot(object):
     """ Un ilot est compose de :
         - individus: une liste d'individu
         - individu_sum: la somme de la norme de chaque individu
-        - nb_individu: le nombre d'individu de l'ilot """
+        - nb_individu: le nombre d'individu de l'ilot
+    """
 
     def __init__(self, vector_dimension, ilot_size):
         """ Constructeur de la classe
@@ -27,9 +28,19 @@ class Ilot(object):
         :param offset: Indice de démarrage dans la liste d'individus
         """
         chunk_offset = chunk * offset
-        sublist = sorted(self.indivuduals[chunk:chunk_offset], reverse=maximum)
-        both_best = sublist[0:2]
-        random_3rd = choice(sublist[2:len(sublist)])
+        # Si le décalage dépasse le maximum, on s'arrête.
+        if chunk_offset <= len(self.indivuduals):
+            sublist = sorted(self.indivuduals[chunk:chunk_offset], key=lambda x: x.fitness, reverse=maximum)
+            both_best = sublist[0:2]
+            random_3rd = choice(sublist[2:len(sublist)])
+
+            # Ajoute le vecteur résultant du 2eme meilleur vers le 1er au 3ème vecteur random
+            to_added =\
+                Individual.make_individual(
+                    numpy.add(numpy.subtract(both_best[0], both_best[1]), random_3rd), random_3rd)
+
+            sublist[-1] = to_added
+            self.indivuduals[chunk:chunk_offset] = sublist
 
     def selection(self, chunk=7, parallelized=True):
         """ Réalise la sélection (le x tournoi à réaliser pour parcourir l'ilot complet)
@@ -42,3 +53,18 @@ class Ilot(object):
         self.indivudual_sum = 0
         for i in range(len(self.indivuduals) / chunk):
             self._tournament_(chunk, i)
+
+    def get_size(self):
+        """ Getter pour la taille d'un ilot en nombre d'individus """
+        return self.nb_individuals
+
+    def get_stats(self):
+        """ Getter pour les stats utilisées pour la comparaison """
+        dico = {}
+        sum_map = list(map(numpy.linalg.norm, self.indivuduals))  # norme des vecteurs
+        dico['sum'] = sum(sum_map[:1], sum_map[0])  # somme les normes entre elles
+        dico['size'] = self.nb_individuals
+        return dico
+
+    def compare(self, stats):
+        return self.get_stats()['sum'] > stats['sum']
