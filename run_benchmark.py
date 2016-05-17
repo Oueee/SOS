@@ -4,6 +4,7 @@
 import time
 import numpy as np
 from lib import fgeneric as fg, bbobbenchmarks as bb
+from lib.support import *
 
 datapath = 'out'
 dimensions = (2,)
