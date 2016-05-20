@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import numpy
-from individu import Individual
-from random import shuffle
-from random import choice
-from Message import MessageBody
+from random import shuffle, choice
+
+from src.individu import Individual
+from src.Message import MessageBody
 
 
 class Ilot(object):
@@ -54,7 +54,7 @@ class Ilot(object):
         shuffle(self.indivuduals)
 
         self.indivudual_sum = 0
-        for i in range(len(self.indivuduals) / chunk):
+        for i in range(len(self.indivuduals) // chunk):
             self._tournament_(chunk, i)
 
     def get_size(self):

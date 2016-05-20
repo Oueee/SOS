@@ -114,15 +114,15 @@ class LinkerShell(Linker):
 
 
 if __name__ == '__main__':
-    for i in xrange(NB_ILOTS):
+    for i in range(NB_ILOTS):
         linker = LinkerShell()
         ILOTS_LIST.append(linker)
 
-    for ii in xrange(0, 10):
+    for ii in range(0, 10):
         ILOTS_LIST[0].send_statistics()
 
     time.sleep(5)
 
-    for i in xrange(NB_ILOTS):
+    for i in range(NB_ILOTS):
         print(ILOTS_LIST[i].values[0])
         ILOTS_LIST[i].join()
