@@ -11,3 +11,6 @@ if sys.version_info < (3,):
 else:
     text_type = str
     binary_type = bytes
+
+if sys.version_info < (3,):
+    range = xrange
