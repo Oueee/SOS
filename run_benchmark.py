@@ -89,7 +89,22 @@ for fun_id in funs_id:
             # f.evalfun: the function (to call with a vector)
             # dim: the number of dimensions
             # f.ftarget: the target to reach (+ or - np.Inf)\
+
+
+            ###########################################################
+            ###########################################################
+            ###########################################################
+            #                           Par ici
+            ###########################################################
+            ###########################################################
+            ###########################################################
+
+
+            ### Run avec notre algo
             run_optimizer_sos(f, dim,  10000)
+
+            ### Run purement aleatoire (au pire on montre ces resultats xD)
+            #run_optimizer(f.evalfun, dim,  10000, f.ftarget)
 
             f.finalizerun()
 
