@@ -23,5 +23,5 @@ class Individual(object):
         return self.fitness
 
     @staticmethod
-    def make_individual(vector):
-        Individual(vector)
+    def make_individual(vector, fecondation=None):
+        return Individual(vector, fecondation)
