@@ -14,15 +14,17 @@ class Ilot(object):
         - nb_individu: le nombre d'individu de l'ilot
     """
 
-    def __init__(self, vector_dimension, ilot_size):
+    def __init__(self, vector_dimension, ilot_size, function):
         """ Constructeur de la classe
             Crée un ilot de taille ilot_size avec des individus de dimension vector_dimension
+            :param function: la fonction ou trouver le minimum global
             :param vector_dimension: Dimension d'un individu
             :param ilot_size: Taille d'un ilot
         """
         self.indivuduals = list(map(Individual.make_individual, numpy.random.rand(ilot_size, vector_dimension)))
         self.indivudual_sum = 0
         self.nb_individuals = ilot_size
+        self.function = function
 
     def _tournament_(self, chunk, offset, maximum=True):
         """ Réalise un tournoi chunk-aire à partir de l'élément offset de self.individuals
@@ -33,7 +35,7 @@ class Ilot(object):
         chunk_offset = chunk * offset
         # Si le décalage dépasse le maximum, on s'arrête.
         if chunk_offset + chunk <= len(self.indivuduals):
-            sublist = sorted(self.indivuduals[chunk_offset:chunk_offset+chunk], key=lambda x: x.evaluation(), reverse=maximum)
+            sublist = sorted(self.indivuduals[chunk_offset:chunk_offset+chunk], key=lambda x: x.evaluation(self.function), reverse=maximum)
             both_best = [ind.vector for ind in sublist[0:2]]
             random_3rd = choice(sublist[2:len(sublist)]).vector
 

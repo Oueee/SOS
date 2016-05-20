@@ -5,6 +5,7 @@ import time
 import numpy as np
 from lib import fgeneric as fg, bbobbenchmarks as bb
 from lib.support import *
+from src import Ilot, globals as gb
 
 datapath = 'out'
 dimensions = (2,)
@@ -20,6 +21,25 @@ t_start = time.time()
 np.random.seed(int(t_start))
 
 f = fg.LoggingFunction(datapath, **opts)
+
+
+def run_optimizer_sos(f, dim, maxfunevals):
+    """start the optimizer, allowing for some preparation.
+    This implementation is an empty template to be filled
+
+    """
+    for _ in range(gb.NB_ILOTS):
+        ilot = Ilot.Ilot(dim, gb.NB_INDIVUDUALS, f.evalfun)
+        gb.ILOTS_LIST.append(ilot)
+
+    for _ in range(maxfunevals/(gb.NB_INDIVUDUALS*gb.NB_ILOTS)):
+        for ilot in gb.ILOTS_LIST:
+            ilot.selection()
+
+        if f.fbest < f.ftarget: break
+
+    gb.ILOTS_LIST = []
+
 
 def run_optimizer(fun, dim, maxfunevals, ftarget=-np.Inf):
     """start the optimizer, allowing for some preparation.
@@ -69,12 +89,11 @@ for fun_id in funs_id:
             # f.evalfun: the function (to call with a vector)
             # dim: the number of dimensions
             # f.ftarget: the target to reach (+ or - np.Inf)\
-
-            run_optimizer(f.evalfun, dim,  10000, f.ftarget)
+            run_optimizer_sos(f, dim,  10000)
 
             f.finalizerun()
 
             print('+ instance %d: fbest-ftarget=%.4e in %d evaluations,'
-                  ' elapsed time [h]: %.2f'
+                  ' elapsed time [s]: %.2f'
                   % (iinstance, f.fbest - f.ftarget, f.evaluations,
-                     (time.time()-t_start)/60./60.))
+                     (time.time()-t_start)))

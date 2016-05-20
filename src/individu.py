@@ -19,9 +19,12 @@ class Individual(object):
         self.fitness = fitness
         self.fecondation = fecondation
 
-    def evaluation(self):
-        """ Evaluation du fitness d'un individu """
-        self.fitness = self.fitness or globals.f(self.vector)
+    def evaluation(self, function):
+        """ Evaluation du fitness d'un individu
+        :param function: la fonction a evaluer
+        :return: la valeur rendu par la fonction (i.e: le fitness)
+        """
+        self.fitness = self.fitness or function(self.vector)
         return self.fitness
 
     @staticmethod
