@@ -101,7 +101,7 @@ class LinkerShell(Linker):
         ilo1 --- get_stats() --> ilo2
         ilo1 <-- compare()   --- ilo2
         ilo1.process_answer()
-        
+
         :param stat: statistics of the other ilot
         :return: data to process by the other
         """

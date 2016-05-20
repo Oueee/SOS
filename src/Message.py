@@ -1,5 +1,5 @@
 class Message:
-    class Types():
+    class Types(object):
         stat_transmission = 1
         answer = 2
         end = 3
@@ -8,3 +8,9 @@ class Message:
         self.id_sender = id_sender
         self.type = type_msg
         self.data = data
+
+
+class MessageBody(object):
+    def __init__(self, size_ilot, nb_individuals):
+        self.size_ilot, = size_ilot
+        self.nb_individuals = nb_individuals
