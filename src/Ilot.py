@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import numpy
 from individu import Individual
 from random import shuffle
 from random import choice
+from Message import MessageBody
 
 
 class Ilot(object):
@@ -29,10 +32,10 @@ class Ilot(object):
         """
         chunk_offset = chunk * offset
         # Si le décalage dépasse le maximum, on s'arrête.
-        if chunk_offset <= len(self.indivuduals):
-            sublist = sorted(self.indivuduals[chunk:chunk_offset], key=lambda x: x.fitness, reverse=maximum)
-            both_best = sublist[0:2]
-            random_3rd = choice(sublist[2:len(sublist)])
+        if chunk_offset + chunk <= len(self.indivuduals):
+            sublist = sorted(self.indivuduals[chunk_offset:chunk_offset+chunk], key=lambda x: x.evaluation(), reverse=maximum)
+            both_best = [ind.vector for ind in sublist[0:2]]
+            random_3rd = choice(sublist[2:len(sublist)]).vector
 
             # Ajoute le vecteur résultant du 2eme meilleur vers le 1er au 3ème vecteur random
             to_added =\
@@ -40,7 +43,7 @@ class Ilot(object):
                     numpy.add(numpy.subtract(both_best[0], both_best[1]), random_3rd), random_3rd)
 
             sublist[-1] = to_added
-            self.indivuduals[chunk:chunk_offset] = sublist
+            self.indivuduals[chunk_offset:chunk_offset+chunk] = sublist
 
     def selection(self, chunk=7, parallelized=True):
         """ Réalise la sélection (le x tournoi à réaliser pour parcourir l'ilot complet)
@@ -60,11 +63,11 @@ class Ilot(object):
 
     def get_stats(self):
         """ Getter pour les stats utilisées pour la comparaison """
-        dico = {}
         sum_map = list(map(numpy.linalg.norm, self.indivuduals))  # norme des vecteurs
-        dico['sum'] = sum(sum_map[:1], sum_map[0])  # somme les normes entre elles
-        dico['size'] = self.nb_individuals
-        return dico
+        message_body = MessageBody(sum(sum_map[:1], sum_map[0]),
+                                   self.nb_individuals)
 
-    def compare(self, stats):
-        return self.get_stats()['sum'] > stats['sum']
+        return message_body
+
+    # def compare(self, stats):
+    #     return self.get_stats()['sum'] > stats['sum']
