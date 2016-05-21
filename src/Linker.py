@@ -25,10 +25,11 @@ class Linker(object):
         self.queue_watcher = Process(target=self.reader)
         self.queue_watcher.start()
 
-    def join(self):
+    def delete(self):
         if self.queue_watcher:
             self._send(self.id, Message.Types.end)
             self.queue_watcher.join()
+            self.queue_watcher = None
 
     def _send(self, id_receiver, type_message, data={}):
         message = Message(self.id, type_message, data)

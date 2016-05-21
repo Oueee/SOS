@@ -5,7 +5,7 @@ import time
 import numpy as np
 from lib import fgeneric as fg, bbobbenchmarks as bb
 from lib.support import *
-from src import Ilot, globals as gb
+from src import Ilot, Linker, globals as gb
 
 datapath = 'out'
 dimensions = (2,)
@@ -23,6 +23,12 @@ np.random.seed(int(t_start))
 f = fg.LoggingFunction(datapath, **opts)
 
 
+def one_step():
+    for ilot in gb.ILOTS_LIST:
+        ilot.selection()
+        #ilot.send_statistics()
+
+
 def run_optimizer_sos(f, dim, maxfunevals):
     """start the optimizer, allowing for some preparation.
     This implementation is an empty template to be filled
@@ -32,13 +38,14 @@ def run_optimizer_sos(f, dim, maxfunevals):
         ilot = Ilot.Ilot(dim, gb.NB_INDIVUDUALS, f.evalfun)
         gb.ILOTS_LIST.append(ilot)
 
-    for _ in range(maxfunevals/(gb.NB_INDIVUDUALS*gb.NB_ILOTS)):
-        for ilot in gb.ILOTS_LIST:
-            ilot.selection()
+    one_step()
+    while f.evaluations < maxfunevals and f.fbest >= f.ftarget:
+        one_step()
 
-        if f.fbest < f.ftarget: break
+    for i in list(range(gb.NB_ILOTS))[::-1]:
+        gb.ILOTS_LIST[i].delete()
 
-    gb.ILOTS_LIST = []
+    Linker.Linker.instance_count = 0
 
 
 def run_optimizer(fun, dim, maxfunevals, ftarget=-np.Inf):
