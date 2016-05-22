@@ -34,7 +34,7 @@ class Ilot(Linker):
         super(self.__class__, self).delete()
         del gb.ILOTS_LIST[self.id]
 
-    def _tournament_(self, chunk, offset, maximum=True):
+    def _tournament_(self, chunk, offset, maximum=False):
         """ Réalise un tournoi chunk-aire à partir de l'élément offset de self.individuals
         :param maximum: Précise si l'optimal est un maximum ou un minimum
         :param chunk: Nombre d'individus par tournoi
@@ -45,7 +45,7 @@ class Ilot(Linker):
         if chunk_offset + chunk <= len(self.indivuduals):
             sublist = sorted(self.indivuduals[chunk_offset:chunk_offset+chunk], key=lambda x: x.evaluation(self.function), reverse=maximum)
             both_best = [ind.vector for ind in sublist[0:2]]
-            random_3rd = choice(sublist[2:len(sublist)]).vector
+            random_3rd = choice(sublist[0:1]).vector
 
             # Ajoute le vecteur résultant du 2eme meilleur vers le 1er au 3ème vecteur random
             to_added =\
@@ -55,7 +55,7 @@ class Ilot(Linker):
             sublist[-1] = to_added
             self.indivuduals[chunk_offset:chunk_offset+chunk] = sublist
 
-    def selection(self, chunk=7, parallelized=True):
+    def selection(self, chunk=6, parallelized=True):
         """ Réalise la sélection (le x tournoi à réaliser pour parcourir l'ilot complet)
         :param chunk: Nombre d'individus par tournoi
         :param parallelized: Précise si l'on doit utiliser la parallélisation ou non

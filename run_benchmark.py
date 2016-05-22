@@ -9,7 +9,7 @@ from src import Ilot, Linker, globals as gb
 
 datapath = 'out'
 dimensions = (2,)
-funs_id = (1,)
+funs_id = (16,)
 nb_run = 30
 
 # function_ids = bbobbenchmarks.noisyIDs if len(argv) < 3 else eval(argv[2])
