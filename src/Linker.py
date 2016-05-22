@@ -3,21 +3,24 @@ try:
 except ImportError:
     import queue as Q
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Manager
 import multiprocessing
 
 from random import randint
 import time
 
-from globals import NB_ILOTS, ILOTS_LIST, PERCENTAGE_TRANSMISSION_STATS
+from globals import NB_ILOTS, PERCENTAGE_TRANSMISSION_STATS
 from Message import Message
 
+manager = Manager()
 
 class Linker(object):
     instance_count = 0
+    list_queue = manager.list()
 
     def __init__(self):
-        self.queue = Queue()
+        self.queue = manager.Queue()
+        Linker.list_queue.append(self.queue)
 
         self.id = Linker.instance_count
         Linker.instance_count += 1
@@ -33,11 +36,12 @@ class Linker(object):
 
     def _send(self, id_receiver, type_message, data={}):
         message = Message(self.id, type_message, data)
-        ILOTS_LIST[id_receiver].put_in_queue(message)
+        print(Linker.list_queue)
+        Linker.list_queue[id_receiver]
 
     def reader(self):
-
         while True:
+            time.sleep(100)
             try:
                 msg = self.queue.get_nowait()
                 if msg.type == Message.Types.stat_transmission:

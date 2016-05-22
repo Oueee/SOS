@@ -6,6 +6,9 @@ import numpy as np
 from lib import fgeneric as fg, bbobbenchmarks as bb
 from lib.support import *
 from src import Ilot, Linker, globals as gb
+from multiprocessing import Manager
+
+manager = Manager()
 
 datapath = 'out'
 dimensions = (2,)
@@ -23,32 +26,27 @@ np.random.seed(int(t_start))
 f = fg.LoggingFunction(datapath, **opts)
 
 
-def one_step():
-    for ilot in gb.ILOTS_LIST:
-        ilot.selection()
-        #ilot.send_statistics()
-
-
 def run_optimizer_sos(f, dim, maxfunevals):
     """start the optimizer, allowing for some preparation.
     This implementation is an empty template to be filled
 
     """
+    ilot_list = []
+
     for _ in range(gb.NB_ILOTS):
         ilot = Ilot.Ilot(dim, gb.NB_INDIVUDUALS, f.evalfun)
         ilot.start()
-        gb.ILOTS_LIST.append(ilot)
+        ilot_list.append(ilot)
 
     bestFitness = 0
 
     for _ in range(5):
         time.sleep(1)
-        bestFitness = min(ilot.bestFitness.value for ilot in gb.ILOTS_LIST)
+        bestFitness = min(ilot.bestFitness.value for ilot in ilot_list)
         if bestFitness < f.ftarget:
             break
 
-    for i in list(range(gb.NB_ILOTS))[::-1]:
-        ilot = gb.ILOTS_LIST[i]
+    for ilot in ilot_list:
         ilot.to_terminate.value = True
         ilot.join()
         ilot.delete()

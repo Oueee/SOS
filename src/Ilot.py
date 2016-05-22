@@ -42,9 +42,6 @@ class Ilot(Linker, mp.Process):
             #self.send_statistics()
             self.bestFitness.value = min(indi.evaluation(self.function) for indi in self.indivuduals)
 
-    def delete(self):
-        super(self.__class__, self).delete()
-        del gb.ILOTS_LIST[self.id]
 
     def _tournament_(self, chunk, offset, maximum=False):
         """ Réalise un tournoi chunk-aire à partir de l'élément offset de self.individuals
