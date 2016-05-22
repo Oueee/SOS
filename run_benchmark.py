@@ -39,6 +39,8 @@ def run_optimizer_sos(f, dim, maxfunevals):
         ilot.start()
         gb.ILOTS_LIST.append(ilot)
 
+    bestFitness = 0
+
     for _ in range(5):
         time.sleep(1)
         bestFitness = min(ilot.bestFitness.value for ilot in gb.ILOTS_LIST)
@@ -49,9 +51,9 @@ def run_optimizer_sos(f, dim, maxfunevals):
         ilot = gb.ILOTS_LIST[i]
         ilot.to_terminate.value = True
         ilot.join()
-        print(ilot.bestFitness.value)
         ilot.delete()
 
+    print("fbest-ftarget=%.4e" % (ilot.bestFitness.value - f.ftarget))
     Linker.Linker.instance_count = 0
 
 
