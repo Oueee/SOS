@@ -7,9 +7,11 @@ from src.individu import Individual
 from src.Message import MessageBody
 from src.Linker import Linker
 from src import globals as gb
-import multiprocessing
+import multiprocessing as mp
+from operator import attrgetter
 
-class Ilot(Linker):
+
+class Ilot(Linker, mp.Process):
     """ Un ilot est compose de :
         - individus: une liste d'individu
         - individu_sum: la somme de la norme de chaque individu
@@ -23,12 +25,22 @@ class Ilot(Linker):
             :param vector_dimension: Dimension d'un individu
             :param ilot_size: Taille d'un ilot
         """
+
         self.indivuduals = list(map(Individual.make_individual, numpy.random.rand(ilot_size, vector_dimension)))
         self.function = function
-        self.stats = multiprocessing.Array('d', 2)
+        self.stats = mp.Array('d', 2)
         self.stats[0] = ilot_size
-        
+        self.bestFitness = mp.Value('d', 0)
+        self.to_terminate = mp.Value('b', False)
+
         super(self.__class__, self).__init__()
+        mp.Process.__init__(self)
+
+    def run(self):
+        while not self.to_terminate.value:
+            self.selection()
+            #self.send_statistics()
+            self.bestFitness.value = min(indi.evaluation(self.function) for indi in self.indivuduals)
 
     def delete(self):
         super(self.__class__, self).delete()

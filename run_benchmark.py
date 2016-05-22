@@ -36,14 +36,21 @@ def run_optimizer_sos(f, dim, maxfunevals):
     """
     for _ in range(gb.NB_ILOTS):
         ilot = Ilot.Ilot(dim, gb.NB_INDIVUDUALS, f.evalfun)
+        ilot.start()
         gb.ILOTS_LIST.append(ilot)
 
-    one_step()
-    while f.evaluations < maxfunevals and f.fbest >= f.ftarget:
-        one_step()
+    for _ in range(5):
+        time.sleep(1)
+        bestFitness = min(ilot.bestFitness.value for ilot in gb.ILOTS_LIST)
+        if bestFitness < f.ftarget:
+            break
 
     for i in list(range(gb.NB_ILOTS))[::-1]:
-        gb.ILOTS_LIST[i].delete()
+        ilot = gb.ILOTS_LIST[i]
+        ilot.to_terminate.value = True
+        ilot.join()
+        print(ilot.bestFitness.value)
+        ilot.delete()
 
     Linker.Linker.instance_count = 0
 
@@ -113,9 +120,9 @@ for fun_id in funs_id:
             ### Run purement aleatoire (au pire on montre ces resultats xD)
             #run_optimizer(f.evalfun, dim,  10000, f.ftarget)
 
-            f.finalizerun()
+            #f.finalizerun()
 
-            print('+ instance %d: fbest-ftarget=%.4e in %d evaluations,'
-                  ' elapsed time [s]: %.2f'
-                  % (iinstance, f.fbest - f.ftarget, f.evaluations,
-                     (time.time()-t_start)))
+            #print('+ instance %d: fbest-ftarget=%.4e in %d evaluations,'
+            #      ' elapsed time [s]: %.2f'
+            #      % (iinstance, f.fbest - f.ftarget, f.evaluations,
+            #         (time.time() - t_start)))
